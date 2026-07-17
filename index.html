@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>¿Qué cadena invisible cargas hoy? — Quiz</title>
+<meta name="description" content="Descubre en menos de un minuto qué te está impidiendo vivir en libertad, y encuentra el mapa completo para soltarlo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F2E9;
+    --bg-soft:#EEEADC;
+    --sage:#7C9885;
+    --sage-dark:#5A7566;
+    --gold:#AD8716;
+    --gold-dark:#8C6D10;
+    --ink:#3A362E;
+    --ink-soft:#6B665A;
+    --card:#FFFFFF;
+    --line:#E3DECD;
+    --radius:20px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:'Inter', -apple-system, sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+    overflow-x:hidden;
+  }
+  body::before{
+    content:'';
+    position:fixed;
+    top:-20%; left:50%;
+    transform:translateX(-50%);
+    width:600px; height:600px;
+    background:radial-gradient(circle, rgba(124,152,133,0.18) 0%, rgba(124,152,133,0) 70%);
+    pointer-events:none;
+    z-index:0;
+  }
+  .app{
+    width:100%;
+    max-width:440px;
+    position:relative;
+    z-index:1;
+  }
+  .progress-wrap{
+    width:100%;
+    height:5px;
+    background:var(--bg-soft);
+    border-radius:99px;
+    overflow:hidden;
+    margin-bottom:28px;
+    opacity:0;
+    transition:opacity .4s ease;
+  }
+  .progress-wrap.visible{opacity:1;}
+  .progress-bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--sage), var(--gold));
+    border-radius:99px;
+    transition:width .5s cubic-bezier(.4,0,.2,1);
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:36px 28px;
+    box-shadow:0 2px 8px rgba(58,54,46,0.04), 0 12px 32px rgba(58,54,46,0.06);
+    text-align:center;
+  }
+  .screen{
+    display:none;
+    animation:fadeIn .5s ease;
+  }
+  .screen.active{display:block;}
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .screen{animation:none;}
+  }
+
+  .eyebrow{
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--sage-dark);
+    margin-bottom:14px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:26px;
+    line-height:1.28;
+    color:var(--ink);
+    margin-bottom:14px;
+  }
+  h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:21px;
+    line-height:1.35;
+    color:var(--ink);
+    margin-bottom:8px;
+  }
+  p.sub{
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:26px;
+  }
+  .breath{
+    width:64px; height:64px;
+    margin:0 auto 22px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff, var(--sage) 75%);
+    box-shadow:0 0 0 8px rgba(124,152,133,0.12);
+    animation:breathe 3.2s ease-in-out infinite;
+  }
+  @keyframes breathe{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .breath{animation:none;}
+  }
+
+  .btn{
+    display:inline-block;
+    width:100%;
+    background:var(--gold);
+    color:#fff;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:16px;
+    padding:16px 20px;
+    border:none;
+    border-radius:14px;
+    cursor:pointer;
+    transition:background .2s ease, transform .15s ease;
+    text-decoration:none;
+    box-shadow:0 4px 14px rgba(173,135,22,0.28);
+  }
+  .btn:hover{background:var(--gold-dark);}
+  .btn:active{transform:scale(.98);}
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink-soft);
+    box-shadow:none;
+    font-size:14px;
+    font-weight:500;
+    padding:10px;
+    margin-top:10px;
+  }
+  .btn-ghost:hover{color:var(--ink); background:transparent;}
+
+  .q-count{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    font-weight:600;
+    margin-bottom:10px;
+    letter-spacing:.03em;
+  }
+  .q-text{
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    font-weight:500;
+    line-height:1.35;
+    margin-bottom:24px;
+    color:var(--ink);
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .option{
+    text-align:left;
+    background:var(--bg);
+    border:1.5px solid var(--line);
+    border-radius:14px;
+    padding:15px 18px;
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink);
+    cursor:pointer;
+    transition:all .18s ease;
+  }
+  .option:hover{
+    border-color:var(--sage);
+    background:#F0F5F1;
+  }
+  .option.selected{
+    border-color:var(--gold);
+    background:#FBF3E2;
+  }
+
+  .loader-wrap{padding:20px 0;}
+  .loader-line{
+    font-size:14.5px;
+    color:var(--ink-soft);
+    margin-bottom:14px;
+    min-height:20px;
+  }
+  .dots{
+    display:flex;
+    gap:6px;
+    justify-content:center;
+    margin-top:18px;
+  }
+  .dot{
+    width:8px; height:8px;
+    border-radius:50%;
+    background:var(--sage);
+    opacity:.3;
+    animation:pulse 1.2s ease-in-out infinite;
+  }
+  .dot:nth-child(2){animation-delay:.15s;}
+  .dot:nth-child(3){animation-delay:.3s;}
+  @keyframes pulse{
+    0%,100%{opacity:.3; transform:scale(1);}
+    50%{opacity:1; transform:scale(1.3);}
+  }
+
+  .result-badge{
+    display:inline-block;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--gold-dark);
+    background:#FBF3E2;
+    padding:6px 14px;
+    border-radius:99px;
+    margin-bottom:16px;
+  }
+  .result-diagnosis{
+    font-family:'Fraunces', serif;
+    font-size:24px;
+    font-weight:500;
+    line-height:1.3;
+    color:var(--ink);
+    margin-bottom:16px;
+  }
+  .result-copy{
+    font-size:15px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    margin-bottom:22px;
+    text-align:left;
+  }
+  .result-copy p{margin-bottom:12px;}
+  .offer-box{
+    background:var(--bg);
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:20px;
+    border:1px solid var(--line);
+  }
+  .offer-title{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    font-weight:500;
+    margin-bottom:6px;
+  }
+  .offer-price{
+    font-size:14px;
+    color:var(--ink-soft);
+  }
+  .offer-price .now{
+    font-size:22px;
+    font-weight:700;
+    color:var(--sage-dark);
+    margin-right:6px;
+  }
+  .offer-price .was{
+    text-decoration:line-through;
+    opacity:.6;
+  }
+  .trust{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:14px;
+  }
+
+  footer.disclaimer{
+    text-align:center;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:18px;
+    opacity:.7;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
+  <div class="card">
+
+    <!-- SCREEN 0: INTRO -->
+    <section class="screen active" id="screen-intro">
+      <div class="breath"></div>
+      <div class="eyebrow">Un minuto, en silencio, contigo</div>
+      <h1>¿Qué cadena invisible estás cargando hoy?</h1>
+      <p class="sub">Responde con honestidad. Al final vas a encontrar, con más claridad, lo que llevas tiempo sintiendo pero no habías podido nombrar.</p>
+      <button class="btn" onclick="startQuiz()">Comenzar</button>
+    </section>
+
+    <!-- SCREEN: QUESTIONS injected by JS -->
+    <section class="screen" id="screen-question">
+      <div class="q-count" id="qCount"></div>
+      <div class="q-text" id="qText"></div>
+      <div class="options" id="qOptions"></div>
+    </section>
+
+    <!-- SCREEN: MID VALIDATION -->
+    <section class="screen" id="screen-mid">
+      <div class="breath"></div>
+      <h2>Ya casi. Respira un momento.</h2>
+      <p class="sub">Lo que estás nombrando aquí, muchas personas lo cargan en silencio durante años. Sigamos.</p>
+      <button class="btn" onclick="continueAfterMid()">Continuar</button>
+    </section>
+
+    <!-- SCREEN: LOADING -->
+    <section class="screen" id="screen-loading">
+      <div class="breath"></div>
+      <h2>Estamos leyendo tus respuestas</h2>
+      <div class="loader-wrap">
+        <div class="loader-line" id="loaderLine">Identificando tu patrón principal…</div>
+        <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+      </div>
+    </section>
+
+    <!-- SCREEN: RESULT -->
+    <section class="screen" id="screen-result">
+      <div class="result-badge">Tu resultado</div>
+      <div class="result-diagnosis" id="resultTitle"></div>
+      <div class="result-copy" id="resultCopy"></div>
+
+      <div class="offer-box">
+        <div class="offer-title">De la Esclavitud a la Libertad</div>
+        <div class="offer-price"><span class="now">$17.99</span><span class="was">$27.99</span></div>
+        <p style="font-size:13px;color:var(--ink-soft);margin-top:8px;">El mapa completo, en un solo PDF de 12 semanas, para trabajar exactamente esto — a tu ritmo, desde esta noche.</p>
+      </div>
+
+      <a class="btn" id="ctaButton" href="#" target="_blank" rel="noopener">Quiero mi copia ahora</a>
+      <div class="trust">Descarga inmediata · Acceso de por vida · Garantía de 7 días</div>
+    </section>
+
+  </div>
+  <footer class="disclaimer">Contenido basado en la fe católica. Resultado con fines de reflexión personal.</footer>
+</div>
+
+<script>
+/* ============ CONFIG ============ */
+const CHECKOUT_URL = "https://pay.hotmart.com/Q106777833W?checkoutMode=10";
+
+/* ============ QUESTIONS ============
+   Cada opción suma a una categoría: miedo | resentimiento | culpa | vacio */
+const QUESTIONS = [
+  {
+    text: "¿Qué frase se parece más a cómo te sientes hoy?",
+    options: [
+      {t:"Vivo con miedo de que algo malo va a pasar", c:"miedo"},
+      {t:"Hay alguien a quien no logro perdonar", c:"resentimiento"},
+      {t:"Siento que no soy suficiente, haga lo que haga", c:"culpa"},
+      {t:"Siento un vacío que nada logra llenar", c:"vacio"},
+    ]
+  },
+  {
+    text: "Cuando algo sale mal, ¿qué es lo primero que piensas?",
+    options: [
+      {t:"Sabía que algo malo iba a pasar", c:"miedo"},
+      {t:"Es por culpa de lo que me hicieron", c:"resentimiento"},
+      {t:"Seguro hice algo mal yo", c:"culpa"},
+      {t:"Da igual, nada de esto importa tanto", c:"vacio"},
+    ]
+  },
+  {
+    text: "¿Qué te quita el sueño con más frecuencia?",
+    options: [
+      {t:"Pensar en todo lo que podría salir mal", c:"miedo"},
+      {t:"Recordar algo que alguien me hizo", c:"resentimiento"},
+      {t:"Repasar mis propios errores", c:"culpa"},
+      {t:"No saber para qué estoy viviendo esto", c:"vacio"},
+    ]
+  },
+  {
+    text: "En tus relaciones, ¿qué patrón reconoces más?",
+    options: [
+      {t:"Me cuesta confiar; espero que algo salga mal", c:"miedo"},
+      {t:"Guardo distancia de quien me lastimó", c:"resentimiento"},
+      {t:"Trato de compensar sintiéndome poco valioso", c:"culpa"},
+      {t:"Me siento solo incluso rodeado de gente", c:"vacio"},
+    ]
+  },
+  {
+    text: "¿Qué necesitas sentir hoy, más que nada?",
+    options: [
+      {t:"Sentirme protegido", c:"miedo"},
+      {t:"Soltar algo que cargo hace tiempo", c:"resentimiento"},
+      {t:"Sentirme perdonado de verdad", c:"culpa"},
+      {t:"Encontrar un propósito real", c:"vacio"},
+    ]
+  },
+  {
+    text: "Si pudieras cambiar una sola cosa hoy, ¿cuál sería?",
+    options: [
+      {t:"Dejar de sentir tanto miedo", c:"miedo"},
+      {t:"Dejar de cargar rencor", c:"resentimiento"},
+      {t:"Dejar de sentirme culpable", c:"culpa"},
+      {t:"Encontrarle sentido a mi vida", c:"vacio"},
+    ]
+  },
+  {
+    text: "¿Qué has intentado antes, sin lograr un cambio real?",
+    options: [
+      {t:"Calmar la ansiedad por mi cuenta", c:"miedo"},
+      {t:"Perdonar y olvidar, pero el dolor regresa", c:"resentimiento"},
+      {t:"Sentirme \"suficiente\" sin lograrlo", c:"culpa"},
+      {t:"Llenar el vacío con trabajo o distracciones", c:"vacio"},
+    ]
+  },
+  {
+    text: "¿Cómo te sientes la mayoría de las mañanas al despertar?",
+    options: [
+      {t:"Con ansiedad, antes de que pase nada", c:"miedo"},
+      {t:"Pensando en alguien con quien sigo enojado", c:"resentimiento"},
+      {t:"Con culpa, sin saber exactamente por qué", c:"culpa"},
+      {t:"Sin ganas de nada en particular", c:"vacio"},
+    ]
+  },
+  {
+    text: "¿Qué te impide acercarte más a Dios hoy?",
+    options: [
+      {t:"Miedo a que me pida algo que no pueda cumplir", c:"miedo"},
+      {t:"No poder perdonar a quien me hizo daño", c:"resentimiento"},
+      {t:"Sentir que no merezco su amor", c:"culpa"},
+      {t:"No sentir nada, ni cerca ni lejos", c:"vacio"},
+    ]
+  },
+  {
+    text: "Si hoy encontraras la libertad que buscas, ¿qué notarías primero?",
+    options: [
+      {t:"Dormiría en paz, sin miedo constante", c:"miedo"},
+      {t:"Podría pensar en esa persona sin dolor", c:"resentimiento"},
+      {t:"Me sentiría digno de ser amado", c:"culpa"},
+      {t:"Sabría, por fin, para qué estoy aquí", c:"vacio"},
+    ]
+  },
+];
+
+const MID_SCREEN_AFTER = 5; // show validation screen after this many questions answered
+
+const RESULTS = {
+  miedo: {
+    title: "La cadena del miedo constante",
+    copy: [
+      "No es que exageres. Es que has vivido, quizás por años, en alerta, esperando el próximo golpe antes de que llegue.",
+      "Ese miedo no nació de la nada — y tampoco se va solo con \"pensar positivo\". Necesita un camino concreto: nombrarlo, entender de dónde viene, y aprender, paso a paso, a descansar en algo más grande que tu ansiedad.",
+      "Eso es exactamente lo que trabajan las 12 semanas de este ebook."
+    ]
+  },
+  resentimiento: {
+    title: "El peso que no has soltado",
+    copy: [
+      "Cargas algo — o a alguien — desde hace tiempo. Y aunque por fuera parezca que ya \"lo superaste\", ese peso sigue ahí, apareciendo justo cuando menos lo esperas.",
+      "Perdonar de verdad no es fingir que no dolió. Es un proceso real, con pasos concretos, que pocas veces alguien nos enseña bien.",
+      "Ese proceso es exactamente lo que recorre este ebook, semana a semana."
+    ]
+  },
+  culpa: {
+    title: "La voz que dice que no eres suficiente",
+    copy: [
+      "Esa voz que te dice que no importa cuánto hagas, nunca es suficiente — no es la voz de Dios. Es una herida que ha aprendido a sonar como verdad.",
+      "Sanarla no es cuestión de esforzarte más. Es cuestión de entender, con claridad, de dónde viene esa culpa y cómo se sana de raíz, no solo por fuera.",
+      "Ese es el camino que este ebook te ayuda a recorrer."
+    ]
+  },
+  vacio: {
+    title: "El vacío que nada ha llenado",
+    copy: [
+      "Has probado llenarlo con logros, con trabajo, con relaciones, con distracción. Y aun así, ese vacío sigue ahí, en los momentos de silencio.",
+      "No es un vacío que se llena con más ruido. Es un vacío con forma de propósito, y solo se llena encontrando aquello para lo que realmente fuiste creado.",
+      "Ese es exactamente el camino que trazan estas 12 semanas."
+    ]
+  }
+};
+
+/* ============ STATE ============ */
+let current = 0;
+let scores = {miedo:0, resentimiento:0, culpa:0, vacio:0};
+let midShown = false;
+
+const screens = {
+  intro: document.getElementById('screen-intro'),
+  question: document.getElementById('screen-question'),
+  mid: document.getElementById('screen-mid'),
+  loading: document.getElementById('screen-loading'),
+  result: document.getElementById('screen-result'),
+};
+const progressWrap = document.getElementById('progressWrap');
+const progressBar = document.getElementById('progressBar');
+
+function showScreen(key){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[key].classList.add('active');
+}
+
+function updateProgress(){
+  const pct = Math.round((current / QUESTIONS.length) * 100);
+  progressBar.style.width = pct + '%';
+}
+
+function startQuiz(){
+  progressWrap.classList.add('visible');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  document.getElementById('qCount').textContent = `Pregunta ${current+1} de ${QUESTIONS.length}`;
+  document.getElementById('qText').textContent = q.text;
+  const optsWrap = document.getElementById('qOptions');
+  optsWrap.innerHTML = '';
+  q.options.forEach(opt => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt.t;
+    div.onclick = () => selectOption(opt.c, div);
+    optsWrap.appendChild(div);
+  });
+  updateProgress();
+  showScreen('question');
+}
+
+function selectOption(category, el){
+  el.classList.add('selected');
+  scores[category]++;
+  current++;
+  setTimeout(() => {
+    if (!midShown && current === MID_SCREEN_AFTER){
+      midShown = true;
+      showScreen('mid');
+    } else if (current < QUESTIONS.length){
+      renderQuestion();
+    } else {
+      runLoading();
+    }
+  }, 260);
+}
+
+function continueAfterMid(){
+  renderQuestion();
+}
+
+function runLoading(){
+  progressBar.style.width = '100%';
+  showScreen('loading');
+  const lines = [
+    "Identificando tu patrón principal…",
+    "Comparando tus respuestas…",
+    "Preparando tu resultado…"
+  ];
+  let i = 0;
+  const loaderLine = document.getElementById('loaderLine');
+  const interval = setInterval(() => {
+    i++;
+    if (i < lines.length){
+      loaderLine.textContent = lines[i];
+    } else {
+      clearInterval(interval);
+      showResult();
+    }
+  }, 700);
+}
+
+function showResult(){
+  let topCategory = 'miedo';
+  let topScore = -1;
+  Object.entries(scores).forEach(([cat, val]) => {
+    if (val > topScore){ topScore = val; topCategory = cat; }
+  });
+  const r = RESULTS[topCategory];
+  document.getElementById('resultTitle').textContent = r.title;
+  const copyWrap = document.getElementById('resultCopy');
+  copyWrap.innerHTML = r.copy.map(p => `<p>${p}</p>`).join('');
+  document.getElementById('ctaButton').href = CHECKOUT_URL;
+  showScreen('result');
+}
+</script>
+</body>
+</html>
