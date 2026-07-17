@@ -8,6 +8,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1550062749898122');
+fbq('track', 'PageView');
+</script>
+<!-- End Meta Pixel Code -->
 <style>
   :root{
     --bg:#F5F2E9;
@@ -305,6 +319,11 @@
 </style>
 </head>
 <body>
+<!-- Meta Pixel Code (noscript) -->
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=1550062749898122&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code (noscript) -->
 <div class="app">
   <div class="progress-wrap" id="progressWrap"><div class="progress-bar" id="progressBar"></div></div>
   <div class="card">
@@ -588,6 +607,7 @@ function runLoading(){
 }
 
 function showResult(){
+  if (typeof fbq === 'function') { fbq('track', 'Lead'); }
   let topCategory = 'miedo';
   let topScore = -1;
   Object.entries(scores).forEach(([cat, val]) => {
@@ -598,6 +618,9 @@ function showResult(){
   const copyWrap = document.getElementById('resultCopy');
   copyWrap.innerHTML = r.copy.map(p => `<p>${p}</p>`).join('');
   document.getElementById('ctaButton').href = CHECKOUT_URL;
+  document.getElementById('ctaButton').onclick = function(){
+    if (typeof fbq === 'function') { fbq('track', 'InitiateCheckout'); }
+  };
   showScreen('result');
 }
 </script>
